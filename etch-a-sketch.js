@@ -6,13 +6,11 @@ const toggleGridButton = document.querySelector("#toggle-grid");
 const colorSelector = document.querySelector("#color-selector");
 const rainbowButton = document.querySelector("#rainbow");
 const eraserButton = document.querySelector("#eraser");
-const containerWidth = 800;
-const containerHeight = 600;
 let color = "#242424";
 
 gridSizeButton.addEventListener("click", event => {
     var gridSize = window.prompt("Enter grid size (e.g. 16 = 16x16, maximum 100)");
-    if(gridSize === "" || gridSize === null || isNaN(gridSize)) {
+    if(gridSize === "" || gridSize === null || isNaN(gridSize) || gridSize < 2 || gridSize > 100) {
         return;
     } else {
         changeGridSize(gridSize);
@@ -27,24 +25,14 @@ clearGridButton.addEventListener("click", event => {
     eraserButton.style.backgroundColor = "";
 });
 
-let gridLines = true;
 toggleGridButton.addEventListener("click", event => {
     gridItems.forEach(gridItem => {
-        if(gridItem.style.border === "1px solid black") {
+        if(gridItem.style.border === "1px solid rgba(0, 0, 0, 0.13)") {
             gridItem.style.border = "none";
-            gridLines = false;
         } else {
-            gridItem.style.border = "1px solid black";
-            gridLines = true;
+            gridItem.style.border = "1px solid rgba(0, 0, 0, 0.13)";
         }
     });
-
-    if(!gridLines) {
-        gridContainer.style.border = "1px solid black";
-    } else {
-        gridContainer.style.border = "none";
-    }
-
 });
 
 colorSelector.addEventListener("change", event => {
@@ -91,32 +79,21 @@ eraserButton.addEventListener("click", event => {
 generateGrid(16);
 
 function generateGrid(gridSize) {
-    gridContainer.innerHTML = "";
+    gridContainer.innerHTML = ""
 
-    const gridItemWidth = containerWidth / gridSize;
-    const gridItemHeight = containerHeight / gridSize;
-
-    for (let i = 0; i < gridSize * gridSize; i++) {
-        const gridItem = document.createElement("div");
-        gridItem.classList.add("gridItem");
-        gridItem.style.width = `${gridItemWidth}px`;
-        gridItem.style.height = `${gridItemHeight}px`;
-
-        if (!gridLines) {
-            gridItem.style.border = "none";
-        } else {
-            gridItem.style.border = "1px solid black";
+    for(let i = 0; i < gridSize; i++) {
+        let row = document.createElement("div");
+        row.classList.add("grid-row");
+        gridContainer.appendChild(row);
+        for(let j = 0; j < gridSize; j++) {
+            let col = document.createElement("div");
+            col.classList.add("grid-column");
+            col.style.border = "1px solid rgba(0, 0, 0, 0.13)"
+            row.appendChild(col);
         }
-
-        gridContainer.appendChild(gridItem);
     }
-    
-    gridItems = document.querySelectorAll(".gridItem");
+    gridItems = document.querySelectorAll(".grid-column");
 }
-
-
-
-
 
 function randomRGB() {
     const red = Math.floor(Math.random() * 256);
@@ -128,18 +105,17 @@ function randomRGB() {
 
 function changeGridSize(newGridSize) {
     generateGrid(newGridSize);
-    gridItems = document.querySelectorAll(".gridItem");
 }
 
 let isDrawing = false;
 gridContainer.addEventListener("mousedown", (event) => {
-    if (event.target.classList.contains("gridItem")) {
+    if (event.target.classList.contains("grid-column")) {
         isDrawing = true;
     }
 });
     
 gridContainer.addEventListener("mouseover", (event) => {
-    if (isDrawing && event.target.classList.contains("gridItem")) {
+    if (isDrawing && event.target.classList.contains("grid-column")) {
         event.target.style.backgroundColor = color;
 
         if(rainbowMode) {
